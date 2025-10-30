@@ -5,13 +5,23 @@ The goal was to design a clean, maintainable test suite that proves I can create
 
 UI e2e tests for https://www.saucedemo.com using Playwright + TypeScript.
 
-# What It Does
+## What It Does
 
 - Automates SauceDemo web flows: login, sorting, cart, checkout, menu, and route guards
 - Uses a light Page Object Model for reusable steps
 - Includes basic negative tests and a performance smoke check
 
-## Run locally
+## Tech Used 
+Playwright · TypeScript · Node.js · Dotenv · GitHub Actions (for CI)
+
+## Why This Project
+I wanted hands-on experience with Playwright and to show:
+- End-to-end UI automation setup
+- Test design using TypeScript
+- Environment handling and CI setup
+- Clean test structure (not just quick scripts)
+
+## Run Locally
 ```bash
 npm i
 npx playwright install
