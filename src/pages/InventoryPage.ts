@@ -11,6 +11,7 @@ export class InventoryPage {
     await expect(addToCartButton).toBeVisible();
     // add to cart
     await addToCartButton.click();
+    return firstItem;
   }
 
   // open the left-side burger menu

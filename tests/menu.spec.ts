@@ -1,6 +1,7 @@
 import {test, expect} from '@playwright/test';
 import { LoginPage } from '../src/pages/LoginPage';
 import { menu } from '../src/data/menu';
+import { InventoryPage } from '../src/pages/InventoryPage';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
@@ -12,9 +13,8 @@ test.beforeEach(async ({ page }) => {
 
 test('menu boots after login', async ({ page }) => {
   // ensure menu is present
-  const menuButton = page.getByRole('button', { name: 'Open Menu' });
-  await expect(menuButton).toBeVisible();
-  await menuButton.click();
+  const inventoryPage = new InventoryPage(page);
+  await inventoryPage.openMenu();
   // verify menu items are present from data/menu.ts
   for (const item of menu) {
     const menuItem = page.getByText(item.label);
@@ -24,9 +24,9 @@ test('menu boots after login', async ({ page }) => {
 
 test('menu can be closed', async ({page}) => {
     // open the menu
-    const menuButton = page.getByRole('button', { name: 'Open Menu' });
-    await expect(menuButton).toBeVisible();
-    await menuButton.click();
+    const inventoryPage = new InventoryPage(page);
+    await inventoryPage.openMenu();
+    // verify menu is visible
     const menu = page.locator('.bm-menu');
     await expect(menu).toBeVisible();
     // close the menu
@@ -43,9 +43,8 @@ test('all items link works', async ({ page }) => {
   await firstItem.click();
   await expect(page).toHaveURL(/inventory-item\.html/);
   // open the menu
-  const menuButton = page.getByRole('button', { name: 'Open Menu' });
-  await expect(menuButton).toBeVisible();
-  await menuButton.click();
+  const inventoryPage = new InventoryPage(page);
+  await inventoryPage.openMenu();
   // click 'All Items'
   const allItemsLink = page.getByText('All Items');
   await expect(allItemsLink).toBeVisible();
@@ -57,9 +56,8 @@ test('all items link works', async ({ page }) => {
 
 test('about link works', async ({ page }) => {
   // open the menu
-  const menuButton = page.getByRole('button', { name: 'Open Menu' });
-  await expect(menuButton).toBeVisible();
-  await menuButton.click();
+  const inventoryPage = new InventoryPage(page);
+  await inventoryPage.openMenu();
   // click 'About'
   const aboutLink = page.getByText('About');
   await expect(aboutLink).toBeVisible();
@@ -70,9 +68,8 @@ test('about link works', async ({ page }) => {
 
 test('logout works from menu', async ({ page }) => {
   // open the menu
-  const menuButton = page.getByRole('button', { name: 'Open Menu' });
-  await expect(menuButton).toBeVisible();
-  await menuButton.click();
+  const inventoryPage = new InventoryPage(page);
+  await inventoryPage.openMenu();
   // click logout
   const logoutLink = page.getByText('Logout');
   await expect(logoutLink).toBeVisible();
@@ -83,15 +80,14 @@ test('logout works from menu', async ({ page }) => {
 });
 
 test('reset app state works', async ({ page }) => {
-  // add an item to the cart
-  const addToCartButton = page.getByRole('button', { name: 'Add to cart' }).first();
-  await addToCartButton.click();
+  // add first item to the cart
+  const inventoryPage = new InventoryPage(page);
+  const firstItem = inventoryPage.addFirstItemToCart();
   // verify cart has 1 item
   const cartBadge = page.locator('.shopping_cart_badge');
   await expect(cartBadge).toHaveText('1');
   // open the menu
-  const menuButton = page.getByRole('button', {name: 'Open Menu'});
-  await menuButton.click();
+  await inventoryPage.openMenu();
   // click 'Reset App State'
   const resetAppStateLink = page.getByText('Reset App State');
   await resetAppStateLink.click();

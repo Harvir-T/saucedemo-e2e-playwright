@@ -1,5 +1,6 @@
 import {test, expect} from '@playwright/test';
 import { LoginPage } from '../src/pages/LoginPage';
+import { InventoryPage } from '../src/pages/InventoryPage';
 
 const x = 5, firstName='John', lastName='Doe', postalCode='12345';
 
@@ -15,11 +16,9 @@ test('add item to cart from inventory page', async ({ page }) => {
     // ensure we're on the inventory page
     await expect(page).toHaveURL(/inventory\.html/);
     // add first item to cart 
-    const firstItem=page.locator('.inventory_item').first();
+    const inventoryPage = new InventoryPage(page);
+    const firstItem=  await inventoryPage.addFirstItemToCart();
     const firstItemName=await firstItem.locator('.inventory_item_name').innerText();
-    console.log('Adding to cart item:', firstItemName);
-    const addToCartButton=firstItem.locator('button').filter({ hasText: 'Add to cart' });
-    await addToCartButton.click();
     // verify remove button is now visible
     const removeButton = page.getByRole('button', { name: 'Remove' });
     await expect(removeButton).toBeVisible();
@@ -36,15 +35,15 @@ test('remove item from cart from inventory page', async ({ page }) => {
     // ensure we're on the inventory page
     await expect(page).toHaveURL(/inventory\.html/);
     // add first item to cart
-    const firstItem=page.locator('.inventory_item').first();
-    const addToCartButton=firstItem.locator('button').filter({ hasText: 'Add to cart' });
-    await addToCartButton.click();
+    const inventoryPage = new InventoryPage(page);
+    const firstItem =  await inventoryPage.addFirstItemToCart();
     // ensure the remove button is visible
     const removeButton = page.getByRole('button', { name: 'Remove' });
     await expect(removeButton).toBeVisible();
     // click remove button
     await removeButton.click();
     // verify add to cart button is now visible
+    const addToCartButton = firstItem.getByRole('button', { name: 'Add to cart' });
     await expect(addToCartButton).toBeVisible();
     // verify cart badge is gone
     const cartBadge = page.locator('.shopping_cart_badge');
@@ -77,10 +76,9 @@ test('Checkout process works', async ({ page }) => {
     // ensure we're on the inventory page
     await expect(page).toHaveURL(/inventory\.html/);
     // add first item to cart
-    const firstItem=page.locator('.inventory_item').first();
+    const inventoryPage = new InventoryPage(page);
+    const firstItem =  await inventoryPage.addFirstItemToCart();
     const firstItemName=await firstItem.locator('.inventory_item_name').innerText();
-    const addToCartButton=firstItem.locator('button').filter({ hasText: 'Add to cart' });
-    await addToCartButton.click();
     // go to cart page
     await page.locator('.shopping_cart_link').click();
     await expect(page).toHaveURL(/cart\.html/);
@@ -111,9 +109,8 @@ test('Checkout cancel works', async ({ page }) => {
     // ensure we're on the inventory page
     await expect(page).toHaveURL(/inventory\.html/);
     // add first item to cart
-    const firstItem=page.locator('.inventory_item').first();
-    const addToCartButton=firstItem.locator('button').filter({ hasText: 'Add to cart' });
-    await addToCartButton.click();
+    const inventoryPage = new InventoryPage(page);
+    const firstItem =  await inventoryPage.addFirstItemToCart();
     // go to cart page
     await page.locator('.shopping_cart_link').click();
     await expect(page).toHaveURL(/cart\.html/);
@@ -191,9 +188,8 @@ test('required fields validation on checkout info page', async ({ page }) => {
     // ensure we're on the inventory page
     await expect(page).toHaveURL(/inventory\.html/);
     // add first item to cart
-    const firstItem = page.locator('.inventory_item').first();
-    const addToCartButton = firstItem.locator('button').filter({ hasText: 'Add to cart' });
-    await addToCartButton.click();
+    const inventoryPage = new InventoryPage(page);
+    const firstItem =  await inventoryPage.addFirstItemToCart();
     // go to cart page
     await page.locator('.shopping_cart_link').click();
     await expect(page).toHaveURL(/cart\.html/);

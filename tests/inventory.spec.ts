@@ -1,6 +1,7 @@
 import {test, expect} from '@playwright/test';
 import { LoginPage } from '../src/pages/LoginPage';
 import { inventory } from '../src/data/inventory';
+import { InventoryPage } from '../src/pages/InventoryPage';
 
 test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -44,13 +45,10 @@ test('each item shows name, description, price, and add to cart button', async (
 
 test('adding and removing items from cart updates button text and cart count', async ({ page }) => {
     // select the first inventory item
-    const firstItem = page.locator('.inventory_item').first();
-    const addToCartButton = firstItem.getByRole('button', { name: 'Add to cart' });
-    await expect(addToCartButton).toBeVisible();
-    // add to cart
-    await addToCartButton.click();
+    const inventoryPage = new InventoryPage(page);
+    const firstItem = inventoryPage.addFirstItemToCart();
     // verify button text changes to 'Remove'
-    const removeButton = firstItem.getByRole('button', { name: 'Remove' });
+    const removeButton = (await firstItem).getByRole('button', { name: 'Remove' });
     await expect(removeButton).toBeVisible();
     // verify cart icon shows 1 item
     const cartBadge = page.locator('.shopping_cart_badge');
@@ -58,6 +56,7 @@ test('adding and removing items from cart updates button text and cart count', a
     //remove from cart
     await removeButton.click();
     //verify button text changes back to 'Add to cart'
+    const addToCartButton = (await firstItem).getByRole('button', { name: 'Add to cart' });
     await expect(addToCartButton).toBeVisible();
     //verify cart icon badge is gone
     await expect(cartBadge).toBeHidden(); 
